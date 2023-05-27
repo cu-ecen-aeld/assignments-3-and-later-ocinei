@@ -133,20 +133,12 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
     if (pid == -1) {
         return -1;
     } else if (pid == 0) {
-        // take out command[0]
-        char *aargs[count];
-        for (int i = 0; i < count; i++) {
-            aargs[i] = command[i+1];
-        }
-        // check whether command[0] is an absolute path
-        if (command[0][0] != '/') {
-            return false;
-        } else if (command[2][0] != '/') {
-            return false;
-        } else {
-            execv(command[0], aargs);
-            exit(-1);
-        }
+
+        FILE *fp = freopen(outputfile, "w", stdout);
+        execv(command[0], command);
+        fclose(fp);
+        exit(-1);
+
     }
     if (waitpid(pid, &status, 0) == -1) {
         return false;
@@ -158,8 +150,6 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
 
     va_end(args);
 
-    return true;
-    va_end(args);
 
     return true;
 }
