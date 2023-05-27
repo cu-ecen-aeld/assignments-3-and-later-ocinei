@@ -86,9 +86,11 @@ bool do_exec(int count, ...)
         }
     }
     if (waitpid(pid, &status, 0) == -1) {
-        return -1;
-    } else if (WIFEXITED(status)) {
+        return false;
+    } else if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
         return true;
+    } else {
+        return false;
     }
 
     va_end(args);
@@ -134,23 +136,25 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         for (int i = 0; i < count; i++) {
             aargs[i] = command[i+1];
         }
-        FILE *fp;
-        fp = freopen(outputfile, "w", stdout);
         // check whether command[0] is an absolute path
         if (command[0][0] != '/') {
             return false;
         } else if (command[2][0] != '/') {
             return false;
         } else {
+            FILE *fp;
+            fp = fopen(outputfile, "w");
             execv(command[0], aargs);
+            fclose(fp);
             exit(-1);
         }
-        fclose(fp);
     }
     if (waitpid(pid, &status, 0) == -1) {
-        return -1;
-    } else if (WIFEXITED(status)) {
+        return false;
+    } else if (WIFEXITED(status) && WEXITSTATUS(status) == 0) {
         return true;
+    } else {
+        return false;
     }
 
     va_end(args);
