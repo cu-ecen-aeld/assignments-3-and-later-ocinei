@@ -2,6 +2,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <string.h>
 
 /**
  * @param cmd the command to execute with system()
@@ -125,6 +126,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
  *   The rest of the behaviour is same as do_exec()
  *
 */
+
     int status;
     pid_t pid;
     pid = fork();
@@ -142,10 +144,7 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         } else if (command[2][0] != '/') {
             return false;
         } else {
-            FILE *fp;
-            fp = fopen(outputfile, "w");
             execv(command[0], aargs);
-            fclose(fp);
             exit(-1);
         }
     }
@@ -157,6 +156,9 @@ bool do_exec_redirect(const char *outputfile, int count, ...)
         return false;
     }
 
+    va_end(args);
+
+    return true;
     va_end(args);
 
     return true;
