@@ -59,9 +59,10 @@ bool start_thread_obtaining_mutex(pthread_t *thread, pthread_mutex_t *mutex,int 
     thread_data_pointer->mutex = mutex;
     // pass thread_data to created thread
     int thread_created = pthread_create(thread, NULL, threadfunc, thread_data_pointer);
-    if( thread_created != 0 ) {
-        return false;
+    if( thread_created == 0 ) {
+        return true;
     }
+
     return false;
 }
 
