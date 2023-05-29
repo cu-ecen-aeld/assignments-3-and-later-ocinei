@@ -110,7 +110,9 @@ cp -a ${FINDER_APP_DIR}/writer ${OUTDIR}/rootfs/home
 cp -a ${FINDER_APP_DIR}/autorun-qemu.sh ${OUTDIR}/rootfs/home
 cp -a ${FINDER_APP_DIR}/finder.sh ${OUTDIR}/rootfs/home
 cp -a ${FINDER_APP_DIR}/finder-test.sh ${OUTDIR}/rootfs/home
-cp -a ${FINDER_APP_DIR}/conf/username.txt ${OUTDIR}/rootfs/home
+mkdir ${OUTDIR}/rootfs/home/conf
+cp -a ${FINDER_APP_DIR}/conf/username.txt ${OUTDIR}/rootfs/home/conf/username.txt
+cp -a ${FINDER_APP_DIR}/conf/assignment.txt ${OUTDIR}/rootfs/home/conf/assignment.txt
 # TODO: Chown the root directory
 cd "$OUTDIR/rootfs"
 sudo chown -R root:root *

@@ -1,4 +1,4 @@
-
+#!/bin/sh
 directory_files=$1
 str_for_search=$2
 
