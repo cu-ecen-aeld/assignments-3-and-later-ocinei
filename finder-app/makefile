@@ -5,7 +5,7 @@
 CC = gcc
 CROSS_COMPILER = aarch64-none-linux-gnu-gcc
 
-default:
+all:
 ifeq ($(CROSS_COMPILE), aarch64-none-linux-gnu-)
 	$(CROSS_COMPILER) -o writer writer.c
 	echo $(CROSS_COMPILER) is used
