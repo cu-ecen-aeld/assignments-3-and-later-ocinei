@@ -50,6 +50,7 @@ int main(int argc, char *argv[])
 
     server_address.sin_family = PF_INET;
     server_address.sin_port = htons(9000);
+    return -1;
     // print binding socket
     int bind_status = bind(socket_fd, (struct sockaddr *)&server_address, sizeof(server_address));
     if(bind_status < 0)
@@ -148,6 +149,8 @@ int main(int argc, char *argv[])
                 }
 
                 close(accept_status);
+                // wait for 5 seconds
+                sleep(5);
                 syslog(LOG_INFO, "Closed connection from %s", inet_ntoa(client_address.sin_addr));
                 closelog();
             }
