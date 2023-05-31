@@ -38,7 +38,7 @@ int main(int argc, char *argv[])
     if(socket_fd < 0)
     {
         printf("Socket creation failed\n");
-        return 1;
+        return -1;
     }
     // print creating socket address
     printf("Creating socket address\n");
@@ -55,14 +55,14 @@ int main(int argc, char *argv[])
     if(bind_status < 0)
     {
         printf("Bind failed\n");
-        return 1;
+        return -1;
     }
     pid_t child_process;
     if (argc == 2 && strcmp(argv[1], "-d") == 0) {
         child_process = fork();
         if (child_process < 0) {
             printf("Fork failed\n");
-            return 1;
+            return -1;
         }
         if (child_process > 0) {
             printf("Child process created\n");
@@ -72,7 +72,7 @@ int main(int argc, char *argv[])
             if(listen_status < 0)
             {
                 printf("Listen failed\n");
-                return 1;
+                return -1;
             }
 
 
@@ -82,13 +82,13 @@ int main(int argc, char *argv[])
                 if(accept_status < 0)
                 {
                     printf("Accept failed\n");
-                    return 1;
+                    return -1;
                 }
-                char client_ipaddr[INET_ADDRSTRLEN];
+                char *client_ipaddr = (char *)malloc(INET_ADDRSTRLEN);
                 if(inet_ntop(PF_INET, &(client_address.sin_addr), client_ipaddr, INET_ADDRSTRLEN) == NULL)
                 {
                     printf("Failed to get ip address of peers\n");
-                    return 1;
+                    return -1;
                 }
 
                 openlog("aesdsocket", LOG_PID|LOG_CONS, LOG_USER);
@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
                 if(fp == NULL)
                 {
                     syslog(LOG_ERR, "Failed to open file: %s", strerror(errno));
-                    return 1;
+                    return -1;
                 }
 
                 // make a very long very long buffer
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
                 if(fp1 == NULL)
                 {
                     syslog(LOG_ERR, "Failed to open file: %s", strerror(errno));
-                    return 1;
+                    return -1;
                 }
                 char buffer1[30000];
                 memset(buffer1, 0, sizeof(buffer1));
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
                 if(read_status == 0)
                 {
                     syslog(LOG_ERR, "Failed to read file: %s", strerror(errno));
-                    return 1;
+                    return -1;
                 }
                 fclose(fp1);
                 // send data to client
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
                 if(send_status == -1)
                 {
                     syslog(LOG_ERR, "Failed to send data: %s", strerror(errno));
-                    return 1;
+                    return -1;
                 }
 
                 close(accept_status);
