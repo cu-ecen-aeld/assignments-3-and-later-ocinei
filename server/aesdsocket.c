@@ -9,7 +9,8 @@
 #include <syslog.h>
 #include <string.h>
 #include <arpa/inet.h>
-
+// include libraries for creating threads
+#include <pthread.h>
 
 int socket_fd;
 
@@ -35,6 +36,9 @@ int main(int argc, char *argv[])
     // print creating socket
     printf("Creating socket\n");
     socket_fd = socket(PF_INET, SOCK_STREAM, 0);
+    if (setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0){
+        error("setsockopt(SO_REUSEADDR) failed");
+    }
     if(socket_fd < 0)
     {
         printf("Socket creation failed\n");
@@ -50,7 +54,8 @@ int main(int argc, char *argv[])
 
     server_address.sin_family = PF_INET;
     server_address.sin_port = htons(9000);
-    return -1;
+    // print client address length
+    printf("Client address length: %d\n", client_address_length);
     // print binding socket
     int bind_status = bind(socket_fd, (struct sockaddr *)&server_address, sizeof(server_address));
     if(bind_status < 0)
@@ -58,14 +63,19 @@ int main(int argc, char *argv[])
         printf("Bind failed\n");
         return -1;
     }
+    // print binding success 
+    printf("Bind success\n");
     pid_t child_process;
     if (argc == 2 && strcmp(argv[1], "-d") == 0) {
+        // print child process running 
+        printf("Child process running\n");
         child_process = fork();
+        printf("Child process: %d\n", child_process);
         if (child_process < 0) {
             printf("Fork failed\n");
             return -1;
         }
-        if (child_process > 0) {
+        if (child_process == 0) {
             printf("Child process created\n");
                         //  print listening socket
             printf("Listening socket\n");
@@ -138,25 +148,24 @@ int main(int argc, char *argv[])
                 }
                 fclose(fp1);
                 // send data to client
-                // if block for if read_status is very long 
                 ssize_t send_status = send(accept_status, buffer1, read_status, 0);
                 // print number of bytes sent 
                 printf("Sent %ld bytes: ", send_status);
                 if(send_status == -1)
                 {
+                    printf("Failed to send data\n");
                     syslog(LOG_ERR, "Failed to send data: %s", strerror(errno));
                     return -1;
                 }
 
                 close(accept_status);
-                // wait for 5 seconds
-                sleep(5);
                 syslog(LOG_INFO, "Closed connection from %s", inet_ntoa(client_address.sin_addr));
                 closelog();
             }
 
             return 0;
         }
+        printf("Fork failed?");
     }
 
     return 0;
